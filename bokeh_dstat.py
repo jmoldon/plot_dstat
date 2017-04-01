@@ -16,9 +16,16 @@ p_dstat = subprocess.Popen(['dstat -Tnlfvs -C total --output={0} {1}'.format(csv
 
 p1 = figure(plot_width=800, plot_height=200)
 r1 = p1.line([], [], color="firebrick", line_width=2)
-
 p2 = figure(plot_width=800, plot_height=200)
 r2 = p2.line([], [], color="firebrick", line_width=2)
+
+p1.x_range.follow = "end"
+p1.x_range.follow_interval = 100
+p1.x_range.range_padding = 0
+
+p2.x_range.follow = "end"
+p2.x_range.follow_interval = 100
+p2.x_range.range_padding = 0
 
 
 p = vplot(p1, p2)
