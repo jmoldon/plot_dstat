@@ -8,6 +8,9 @@ from bokeh.plotting import figure, show, output_file, vplot, save
 #from bokeh.embed import file_html
 from bokeh.io import gridplot, output_file, show
 
+import bokeh
+print bokeh.__version__
+
 output_file("usage.html", title="Usage")
 
 csv_file = 'test.csv'
@@ -18,6 +21,7 @@ w2, h2 = 800, 150
 TOOLS = ['pan','box_zoom','resize', 'save', 'reset']
 
 def start_dstat(outfile, time_step):
+    os.system('mv {0} {1}'.format(outfile, outfile+'_old'))
     p_dstat = subprocess.Popen(['dstat -Tnlfvs -C total --output={0} {1}'.format(outfile, time_step)], shell=True, stdout=open(os.devnull, 'w'))
     print('dstat running on the background')
     return p_dstat
@@ -53,15 +57,18 @@ def plot_dstat(csv_file):
 
     ps = [p0,p1,p2,p3]
     for pi in ps:
-        pi.legend.location = "top_left"
-        pi.legend.padding = 5
+        try:
+            pi.legend.location = "top_left"
+            pi.legend.padding = 5
+        except:
+            pi.legend.orientation = 'top_left'
 
     p= gridplot([[p0],
     [p1],
     [p2],
     [p3]])
 
-    save(p, 'usage.html')
+    save(p, 'plots/usage.html')
 
 def read_csv(csv_file):
     df = pd.read_csv(csv_file, index_col=False,header =0, skiprows=6)
@@ -72,7 +79,7 @@ def read_csv(csv_file):
 
 if __name__ == '__main__':
     #p = start_dstat(csv_file, time_step)
-    #time.sleep(60*120)
+    #time.sleep(60*60*2)
     #end_dstat(p)
     plot_dstat(csv_file)
 
