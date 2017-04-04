@@ -27,7 +27,8 @@ def end_dstat(p):
     print 'End dstat'
 
 
-def plot_dstat():
+def plot_dstat(csv_file):
+    df = read_csv(csv_file)
     mem_gib = 1.0*os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')/(1024**3)
     p0 = figure(plot_width=w2, plot_height=h2, x_axis_type = "datetime", tools = TOOLS)
     p1 = figure(plot_width=w2, plot_height=h2, x_axis_type = "datetime", tools = TOOLS)
@@ -50,6 +51,11 @@ def plot_dstat():
     p1.y_range.end = 100.
     p3.y_range.start = 0.
 
+    ps = [p0,p1,p2,p3]
+    for pi in ps:
+        pi.legend.location = "top_left"
+        pi.legend.padding = 5
+
     p= gridplot([[p0],
     [p1],
     [p2],
@@ -66,8 +72,7 @@ def read_csv(csv_file):
 
 if __name__ == '__main__':
     #p = start_dstat(csv_file, time_step)
-    #time.sleep(100)
+    #time.sleep(60*120)
     #end_dstat(p)
-    df = read_csv(csv_file)
-    plot_dstat()
+    plot_dstat(csv_file)
 
