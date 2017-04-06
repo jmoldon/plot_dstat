@@ -78,8 +78,8 @@ def read_csv(csv_file):
     return df
 
 if __name__ == '__main__':
-    #p = start_dstat(csv_file, time_step)
-    #time.sleep(60*60*2)
-    #end_dstat(p)
+    p = start_dstat(csv_file, time_step)
+    time.sleep(60*60*1)
+    end_dstat(p)
     plot_dstat(csv_file)
 

@@ -12,7 +12,8 @@ logfile = 'eMCP.log'
 time_step = 1 # seconds
 
 def c(i):
-    NUM_COLORS = 50
+    NUM_COLORS = 10
+    i = i%10
     cm = plt.get_cmap('prism')
     cNorm  = matplotlib.colors.Normalize(vmin=0, vmax=NUM_COLORS-1)
     scalarMap = matplotlib.cm.ScalarMappable(norm=cNorm, cmap=cm)
@@ -110,8 +111,7 @@ def plot_total_time(summary):
     yticklabels = ['{1} ({0})'.format(i, ni) for i, ni in enumerate(summary['task'].values)]
     ax.yaxis.set_ticklabels(yticklabels)
     ax.set_xlabel('Total time [h]')
-    ax.set_ylim(ax.get_ylim()[0]+0.5, ax.get_ylim()[-1]-0.5)
-    ax.invert_yaxis()
+    ax.set_ylim(ax.get_ylim()[-1]-0.5, ax.get_ylim()[0]+0.5)
     ax.set_xlim(0, ax.get_xlim()[-1])
     total_time = (summary['date_end'].max()-summary['date_beg'].min()).total_seconds()
     ax.set_title('Total time [hh:mm:ss]: {0}'.format(prt_total_s(total_time)))
