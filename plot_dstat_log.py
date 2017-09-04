@@ -31,7 +31,7 @@ def end_dstat(p):
 
 def summary_log(logfile):
     df = pd.read_csv(logfile, sep = '|', names = ['date','grade','text'])
-    df['date'] = pd.to_datetime(df['date']) -pd.to_timedelta(1, unit='h')
+    df['date'] = df['date'].apply(lambda x:pd.to_datetime(x)-pd.to_timedelta('1h'))
     df['stat'] = df['text'].apply(lambda x: x.split(' ')[1])
     df['task'] = df['text'].apply(lambda x: x.split(' ')[-1])
     beg = df[['date', 'task']][df['stat'] == 'Start']
@@ -40,8 +40,8 @@ def summary_log(logfile):
     end = end.reset_index(drop=True)
     summary = pd.merge(beg,end, left_index=True,right_index=True, suffixes = ['_beg', '_end'])
     summary = summary.rename(columns={'task_beg':'task'})[['task','date_beg','date_end']]
-    summary['total'] = summary['date_end']- summary['date_beg']
-    summary['total_s'] = summary['total']/np.timedelta64(1, 's')
+    summary['total'] = summary.apply(lambda row: row['date_end'] - row['date_beg'], axis=1)
+    summary['total_s'] = summary.apply(lambda x:x['total']/np.timedelta64(1, 's'), axis=1)
     return summary
 
 def read_csv(csv_file):
@@ -53,13 +53,12 @@ def read_csv(csv_file):
     df.index = df['date']
     return df
 
-def read_log(csv_file, logfile, resample = None):
+def read_log(csv_file, resample = None):
     df = read_csv(csv_file)
     if resample:
-        df = df.resample(resample) # For example '5s'
+        df = df.resample(resample).mean() # For example '5S'
         df['date'] = df.index
-    summary = summary_log(logfile)
-    return df, summary
+    return df
 
 def plot_dstat(df, summary):
     mem_gib = 1.0*os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')/(1024**3)
@@ -126,11 +125,16 @@ def prt_total_s(s):
 
 if __name__ == '__main__':
     #p = start_dstat(csv_file, time_step)
-    #time.sleep(60*60*1)
-    #kk = raw_input('Stop?')
+    #time.sleep(60*60*1)            # dstat running during specific time
+    #stop = raw_input('Stop?')      # dstat running until stopped
     #end_dstat(p)
-    df, summary = read_log(csv_file, logfile)
-
-    plot_dstat(df, summary)
+    print('Reading and processing {0}'.format(logfile))
+    summary = summary_log(logfile)
     plot_total_time(summary)
-
+    try:
+        df = read_log(csv_file)
+        plot_dstat(df, summary)
+        print('Processed {0}'.format(csv_file))
+    except:
+        print('Error. csv_file {0} not found'.format(csv_file))
+        pass
